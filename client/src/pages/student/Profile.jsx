@@ -29,10 +29,16 @@ const Profile = () => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
+      // FileReader allows web apps to read the content of files from user's system.Browser cannot directly access our local file system for security reasons.The FileReader API is the safe way to read file in JS without uploading them to a server
+      // reader is an instance of FileReader class.It contains methods and properties to read files as well as event handlers
+
       reader.onloadend = () => {
         setPreview(reader.result);
       };
+      // reader.onloadend is an event handler that is called when the file reading is complete
+      // reader.result will hold the contents of the file in the format we wanted (here we used readAsDataURL)
       reader.readAsDataURL(file);
+      // Take the file object and convert it to a Base64String
     }
   };
 
@@ -152,3 +158,19 @@ const Profile = () => {
 };
 
 export default Profile;
+
+
+/*
+Two Common ways to preview Images in the Browser-:
+
+-> FileReader.readAsDataURL(file):
+Reads the entire file and encodes it as Base64String
+This is not a pointer , it's the actual file data embedded directly in the string 
+
+
+-> URL.createObjectURL(file):
+Instead of reading and encoding , it creates a temporary URL that points to the file's location in the browser's memory
+It does not copy the file it just references it in RAM
+We must manually release it with:
+URL.revokeObjectURL(objectUrl)
+*/
