@@ -1,14 +1,47 @@
 import NavBar from '@/components/NavBar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import React, { useState } from 'react';
 
 const Profile = () => {
-    const user = {
-        name:'John Doe',
-        email:'john.doe@example.com',
-        role:'Student',
-        avatar:'https://github.com/shadcn.png'
+  const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState('John Doe');
+  const [avatar, setAvatar] = useState('https://github.com/shadcn.png');
+  const [preview, setPreview] = useState('https://github.com/shadcn.png');
+  
+  const user = {
+    name,
+    email: 'john.doe@example.com',
+    role: 'Student',
+    avatar: preview
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Here you would typically update the user's profile
+    setAvatar(preview);
+    setIsOpen(false);
+  };
   return (
     <>
       <NavBar />
@@ -49,14 +82,67 @@ const Profile = () => {
               <p className='text-lg'>{user.role}</p>
             </div>
             
-            {/* Edit Profile Button */}
+            {/* Edit Profile Button and Dialog */}
             <div className='pt-4 border-t border-border'>
-              <button 
-                className='w-full py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors'
-                onClick={() => console.log('Edit profile clicked')}
-              >
-                Edit Profile
-              </button>
+              <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                  <Button className='w-full'>
+                    Edit Profile
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit Profile</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className='space-y-4'>
+                    <div className='space-y-2'>
+                      <Label htmlFor='name'>Name</Label>
+                      <Input
+                        id='name'
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder='Enter your name'
+                      />
+                    </div>
+                    
+                    <div className='space-y-2'>
+                      <Label htmlFor='avatar'>Profile Picture</Label>
+                      <div className='flex items-center gap-4'>
+                        <div className='h-16 w-16 rounded-full overflow-hidden'>
+                          <img 
+                            src={preview} 
+                            alt='Preview' 
+                            className='h-full w-full object-cover'
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            id='avatar'
+                            type='file'
+                            accept='image/*'
+                            onChange={handleImageChange}
+                            className='cursor-pointer'
+                          />
+                          <p className='text-sm text-muted-foreground mt-1'>
+                            JPG, PNG, or GIF (max 5MB)
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className='flex justify-end gap-2 pt-4'>
+                      <Button 
+                        type='button' 
+                        variant='outline' 
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button type='submit'>Save Changes</Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
